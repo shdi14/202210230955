@@ -3,12 +3,8 @@ enum ActionKind {
     Idle,
     Jumping
 }
-scene.onHitWall(SpriteKind.Player, function (sprite, location) {
-    tiles.placeOnRandomTile(mySprite, sprites.castle.tilePath5)
-    info.changeScoreBy(12)
-})
 function flyingBat () {
-    mySprite2 = sprites.create(img`
+    bat = sprites.create(img`
         . f f f . . . . . . . . f f f . 
         f f c . . . . . . . f c b b c . 
         f c c . . . . . . f c b b c . . 
@@ -29,7 +25,7 @@ function flyingBat () {
     x_bat = 50
     y_bat = 50
     animation.runImageAnimation(
-    mySprite2,
+    bat,
     [img`
         . . f f f . . . . . . . . f f f 
         . f f c c . . . . . . f c b b c 
@@ -103,11 +99,15 @@ function flyingBat () {
     true
     )
     while (true) {
-        move(mySprite2, x_bat, y_bat, randint(0, 100), randint(0, 150), 1000, 30)
+        move(bat, x_bat, y_bat, randint(10, 100), randint(10, 150), 2000, 30)
+        if (bat.overlapsWith(monkey)) {
+            music.playTone(554, music.beat(BeatFraction.Whole))
+            info.changeLifeBy(-1)
+        }
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    info.changeLifeBy(-1)
+    info.setLife(5)
 })
 function move (sprite: Sprite, x1: number, y1: number, x2: number, y2: number, time: number, frame: number) {
     framesCount = time / 1000 * frame
@@ -115,7 +115,7 @@ function move (sprite: Sprite, x1: number, y1: number, x2: number, y2: number, t
     for (let index = 0; index <= framesCount; index++) {
         dx = (x2 - x1) / framesCount
         dy = (y2 - y1) / framesCount
-        mySprite2.setPosition(x1 + dx * index, y1 + dy * index)
+        bat.setPosition(x1 + dx * index, y1 + dy * index)
         pause(framePause)
     }
     x_bat = x2
@@ -130,9 +130,9 @@ let framePause = 0
 let framesCount = 0
 let y_bat = 0
 let x_bat = 0
-let mySprite2: Sprite = null
-let mySprite: Sprite = null
-mySprite = sprites.create(img`
+let bat: Sprite = null
+let monkey: Sprite = null
+monkey = sprites.create(img`
     . . . . f f f f f . . . . . . . 
     . . . f e e e e e f . . . . . . 
     . . f d d d d e e e f f . . . . 
@@ -150,8 +150,99 @@ mySprite = sprites.create(img`
     f d d c d d d f . . f c d d f . 
     . f f f f f f f . . . f f f . . 
     `, SpriteKind.Player)
-scene.cameraFollowSprite(mySprite)
-controller.moveSprite(mySprite)
+scene.cameraFollowSprite(monkey)
+controller.moveSprite(monkey)
 tiles.setCurrentTilemap(tilemap`level2`)
 info.setLife(5)
+animation.runImageAnimation(
+monkey,
+[img`
+    . . . . f f f f f . . . . . . . 
+    . . . f e e e e e f . . . . . . 
+    . . f d d d d e e e f . . . . . 
+    . c d f d d f d e e f f . . . . 
+    . c d f d d f d e e d d f . . . 
+    c d e e d d d d e e b d c . . . 
+    c d d d d c d d e e b d c . f f 
+    c c c c c d d d e e f c . f e f 
+    . f d d d d d e e f f . . f e f 
+    . . f f f f f e e e e f . f e f 
+    . . . . f e e e e e e e f f e f 
+    . . . f e f f e f e e e e f f . 
+    . . . f e f f e f e e e e f . . 
+    . . . f d b f d b f f e f . . . 
+    . . . f d d c d d b b d f . . . 
+    . . . . f f f f f f f f f . . . 
+    `,img`
+    . . . . f f f f f . . . . . . . 
+    . . . f e e e e e f . . . . . . 
+    . . f d d d d e e e f . . . . . 
+    . c d f d d f d e e f . . . . . 
+    . c d f d d f d e e f f . . . . 
+    c d e e d d d d e e d d f . . . 
+    c d d d d c d d e e b d c . . . 
+    c c c c c d d e e e b d c . f f 
+    . f d d d d e e e f f c . f e f 
+    . f f f f f f e e e e f . f e f 
+    . f f f f e e e e e e e f f e f 
+    f d d f d d f e f e e e e f f . 
+    f d b f d b f e f e e e e f . . 
+    f f f f f f f f f f f f e f . . 
+    . . . . . . . . . f c d d f . . 
+    . . . . . . . . . . f f f f . . 
+    `,img`
+    . . . . f f f f f . . . . . . . 
+    . . . f e e e e e f . . . . . . 
+    . . f d d d d e e e f f . . . . 
+    . c d d d d d d e e d d f . . . 
+    . c d f d d f d e e b d c . . . 
+    c d d f d d f d e e b d c . f f 
+    c d e e d d d d e e f c . f e f 
+    c d d d d c d e e e f . . f e f 
+    . f c c c d e e e f f . . f e f 
+    . . f f f f f e e e e f . f e f 
+    . . . . f e e e e e e e f f f . 
+    . . f f e f e e f e e e e f . . 
+    . f e f f e e f f f e e e f . . 
+    f d d b d d c f f f f f f b f . 
+    f d d c d d d f . . f c d d f . 
+    . f f f f f f f . . . f f f . . 
+    `,img`
+    . . . . f f f f f . . . . . . . 
+    . . . f e e e e e f f f . . . . 
+    . . f d d d e e e e d d f . . . 
+    . c d d d d d e e e b d c . . . 
+    . c d d d d d d e e b d c . . . 
+    c d d f d d f d e e f c . f f . 
+    c d d f d d f d e e f . . f e f 
+    c d e e d d d d e e f . . f e f 
+    . f d d d c d e e f f . . f e f 
+    . . f f f d e e e e e f . f e f 
+    . . . . f e e e e e e e f f f . 
+    . . . . f f e e e e e b f f . . 
+    . . . f e f f e e c d d f f . . 
+    . . f d d b d d c f f f . . . . 
+    . . f d d c d d d f f . . . . . 
+    . . . f f f f f f f . . . . . . 
+    `,img`
+    . . . . f f f f f . . . . . . . 
+    . . . f e e e e e f . . . . . . 
+    . . f d d d d e e e f . . . . . 
+    . c d f d d f d e e f f . . . . 
+    . c d f d d f d e e d d f . . . 
+    c d e e d d d d e e b d c . . . 
+    c d d d d c d d e e b d c . . . 
+    c c c c c d d e e e f c . . . . 
+    . f d d d d e e e f f . . . . . 
+    . . f f f f f e e e e f . . . . 
+    . . . . f f e e e e e e f . f f 
+    . . . f e e f e e f e e f . e f 
+    . . f e e f e e f e e e f . e f 
+    . f b d f d b f b b f e f f e f 
+    . f d d f d d f d d b e f f f f 
+    . . f f f f f f f f f f f f f . 
+    `],
+200,
+true
+)
 flyingBat()
