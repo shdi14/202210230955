@@ -3,6 +3,9 @@ enum ActionKind {
     Idle,
     Jumping
 }
+namespace SpriteKind {
+    export const Text = SpriteKind.create()
+}
 function flyingBat () {
     bat = sprites.create(img`
         . f f f . . . . . . . . f f f . 
@@ -152,7 +155,7 @@ monkey = sprites.create(img`
     `, SpriteKind.Player)
 scene.cameraFollowSprite(monkey)
 controller.moveSprite(monkey)
-tiles.setCurrentTilemap(tilemap`level2`)
+tiles.setCurrentTilemap(tilemap`level0`)
 info.setLife(5)
 animation.runImageAnimation(
 monkey,
